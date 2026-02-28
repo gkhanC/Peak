@@ -1,0 +1,16 @@
+{
+    "name": "@peak/core",
+    "version": "1.0.0",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "tsup src/index.ts --format cjs,esm --dts",
+        "dev": "tsup src/index.ts --format cjs,esm --watch --dts",
+        "lint": "eslint src --ext .ts"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "tsup": "^8.0.2",
+        "typescript": "^5.4.2"
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "name": "@peak/db",
+    "version": "1.0.0",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "tsup index.ts --format cjs,esm --dts",
+        "generate": "drizzle-kit generate",
+        "push": "drizzle-kit push",
+        "studio": "drizzle-kit studio",
+        "lint": "eslint . --ext .ts"
+    },
+    "dependencies": {
+        "@peak/core": "*",
+        "drizzle-orm": "^0.45.1",
+        "pg": "^8.19.0",
+        "postgres": "^3.4.8"
+    },
+    "devDependencies": {
+        "@types/node": "^20.11.25",
+        "drizzle-kit": "^0.31.9",
+        "tsup": "^8.0.2",
+        "tsx": "^4.21.0",
+        "typescript": "^5.4.2"
+    }
+}

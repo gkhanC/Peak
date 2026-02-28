@@ -1,0 +1,35 @@
+# PEAK STRATEJİK GELİŞTİRME PLANI
+
+Bu rapor, TODO.txt dosyasındaki maddelerin uygulanması için hazırlanan teknik yol haritasını içermektedir.
+
+## 1. Mimari Modernizasyon (SOLID & MVC)
+*   **CLI Refaktörü:** `apps/cli/index.ts` dosyasındaki devasa yapı parçalanacaktır. 
+    *   **Model:** `@peak/core` servisleri kullanılmaya devam edilecek, gerekirse genişletilecektir.
+    *   **View:** `apps/cli/src/views` altında CLI çıktılarını (tablo, renk, spinner) yöneten sınıflar oluşturulacaktır.
+    *   **Controller:** `apps/cli/src/controllers` altında kullanıcı girdilerini işleyen ve servisleri çağıran mantık katmanı kurulacaktır.
+*   **Modüler Yapı:** Yeni metrik tipleri eklemeyi kolaylaştırmak için `packages/core` içerisinde "Strategy" veya "Factory" desenleri uygulanacaktır.
+
+## 2. Peak CLI & UX Geliştirmeleri
+*   **Kullanıcı Dostu CLI:** `prompts` kütüphanesi daha etkin kullanılacak, hata mesajları ve yönlendirmeler iyileştirilecektir.
+*   **Tam CRUD Desteği:** 
+    *   Board: `create`, `list`, `delete`, `update` (isim/tema/açıklama).
+    *   Metric: Her board için metrik ekleme, silme, düzenleme.
+    *   Data: Manuel değer girişi ve geçmiş verilerin silinmesi/düzenlenmesi.
+*   **Raporlama:** `peak report --board <board_name>` gibi komutlarla ASCII grafikler ve ilerleme özetleri sunulacaktır.
+*   **Dashboard Komutu:** `peak dashboard` komutu ile web arayüzü varsayılan tarayıcıda açılacaktır.
+
+## 3. Web Dashboard & Quick Menu (Cmd + K)
+*   **Gelişmiş Quick Menu:** Mevcut `GlobalCommandPalette.tsx` sadece numara ile seçim yerine, arama (fuzzy search) ve daha sezgisel bir navigasyon yapısına kavuşturulacaktır.
+*   **CLI Paritesi:** CLI'daki tüm yeni fonksiyonlar (raporlama, detaylı düzenleme) web arayüzüne de eklenecektir.
+
+## 4. Dağıtım ve Dokümantasyon
+*   **Kurulum:** `npm install -g` ile kurulabilir yapı (bin konfigürasyonu) tamamlanacaktır.
+*   **README:** CLI komutları ve web kullanımı için kapsamlı görsel destekli doküman hazırlanacaktır.
+
+## Durum Takibi
+[ ] 1. Analiz ve Stratejik Planlama
+[ ] 2. Peak CLI Refaktörü (MVC/SOLID)
+[ ] 3. CLI Tam CRUD & Raporlama
+[ ] 4. Web Dashboard & Quick Menu İyileştirmeleri
+[ ] 5. Performans & Güvenlik Analizi
+[ ] 6. Dağıtım & Dokümantasyon

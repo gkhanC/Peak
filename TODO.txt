@@ -1,0 +1,60 @@
+Bu listede ki taskleri sıra ile yap 
+Taskleri sıra ile yapacağız ama taskleri önce nasıl yapacağımızı Peak'ın kaynak kodunu inceleyerek planla, nasıl bu özellikleri sağlayacağımızı planlayarak, planı Peak'ın ana dizini içerisinde bir txt dosyasına yaz.
+Oluşturulan txt dosyasına uygun şekilde Peak kaynak kodunu geliştir. biten taskleri bu belgede [X] bitti olarak hazırla.
+
+1. Analiz ve Stratejik Planlama
+[X] Peak kaynak kodunun detaylı analizini gerçekleştir.
+
+[X] Analiz sonuçlarına dayanarak; özelliklerin nasıl uygulanacağını, mimari değişiklikleri ve teknik yöntemleri içeren bir plan hazırla.
+
+[X] Bu planı Peak ana dizini içerisinde bir .txt dosyasına rapor olarak yaz.
+
+[X] Geliştirme sürecini bu oluşturulan .txt dosyasına %100 uyumlu şekilde yürüt.
+
+2. Peak CLI & UX Geliştirmeleri
+[X] Peak CLI'ı "user-friendly" (kullanıcı dostu) bir yapıya kavuştur.
+
+[X] Dashboard üzerindeki tüm işlemleri CLI üzerinden yapılabilir hale getir:
+
+[X] CLI ile yeni Board oluşturma, silme ve düzenleme (database entegrasyonu dahil).
+
+[X] Board içerisine yeni metrikler ekleme (metrik tipine özgü konfigürasyon desteği ile).
+
+[X] Mevcut metrikleri düzenleme, silme ve anlık database kaydı.
+
+[X] Metrik parametre yapısına uygun, kolay ve kullanıcı dostu yeni değer girişi.
+
+[X] Hem Board hem de Metrikler için eksiksiz CRUD (Oluşturma, Okuma, Güncelleme, Silme) operasyonlarını tamamla.
+
+[X] CLI üzerinden veri değişimi, performans ilerlemesi ve metrik bilgilerini içeren raporlama sistemini kur.
+
+3. Web Arayüzü & Quick Menu Entegrasyonu
+[X] CLI'ın sahip olduğu tüm yetenekleri Web Dashboard sayfasına entegre et.
+
+[X] Cmd + K kısayolu ile açılan "Quick Menu" üzerinden tüm bu işlemleri uygulanabilir hale getir.
+
+4. Mimari Modernizasyon & Kod Kalitesi
+[X] Kodun SOLID prensiplerini eksiksiz karşılamasını sağla; ihlal edilen kısımları düzenle.
+
+[X] Sistemi modüler ve kalıtıma (inheritance) dayalı, yeni modül eklemeye açık bir yapıya dönüştür.
+
+[X] MVC (Model-View-Controller) mimarisini düzgün şekilde uygula.
+
+[X] Design Pattern (Tasarım Kalıpları) hatalarını düzelt ve eksikleri tamamlayarak kod kalitesini artır.
+
+[X] Kapsamlı bir performans optimizasyonu analizi yap ve gerekli iyileştirmeleri uygula.
+
+[X] Detaylı güvenlik analizi yap ve potansiyel açıkları kapat.
+
+[X] Kodu Refactor et; tekrar eden/gereksiz kısımları kaldır, bütünlüğü sağla ve bug oluşumunu engelle.
+
+[X] Sistemin sorunsuz çalıştığından emin olmak için son bir kod bütünlüğü analizi yap.
+
+5. Dağıtım, Dokümantasyon ve Versiyonlama
+[X] Peak'in hem terminal hem web üzerinden kullanımını standardize et (Terminalden peak dashboard komutu ile başlatma desteği).
+
+[X] Linux, Windows ve macOS sistemler için kolay kurulum (deploy) yapılarını oluştur.
+
+[X] Tüm özellikleri ve CLI komutlarını örneklerle açıklayan kapsamlı bir README.md dosyası hazırla.
+
+[X] Kodları mantıksal gruplar halinde Git sistemine uygun şekilde commit'le ve GitHub için deploy sürecini tamamla.
