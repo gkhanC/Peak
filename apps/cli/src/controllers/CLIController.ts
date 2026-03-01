@@ -119,6 +119,7 @@ export class CLIController {
                 { title: "Show all metrics", value: "5" },
                 { title: "Show board info", value: "6" },
                 { title: "Delete specific value", value: "7" },
+                { title: "Show full metric history", value: "h" },
                 { title: "Show Progress Report", value: "r" },
                 { title: "Launch Dashboard", value: "d" },
                 { title: "Back to main", value: "8" },
@@ -138,12 +139,48 @@ export class CLIController {
                 case "5": await this.showAllMetrics(board.id); break;
                 case "6": await this.showBoardInfo(board); break;
                 case "7": await this.deleteSpecificValue(board.id); break;
+                case "h": await this.showMetricHistory(board.id); break;
                 case "r": await this.showReport(board.id); break;
                 case "d": await this.openDashboard(); break;
                 case "8": loop = false; break; // Go back to main loop
                 case "0": process.exit(0); break;
             }
         }
+    }
+
+    async showMetricHistory(boardId: number) {
+        const list = await this.metricSvc.getHydratedMetrics(boardId);
+        if (list.length === 0) { CLIView.showInfo("No metrics available."); return; }
+
+        const choices = list.map((m: any) => ({ title: m.name, value: m.id.toString() }));
+        const selection = await CLIView.promptAction("Select metric to view full history:", choices);
+        const m = list.find((x: any) => x.id.toString() === selection);
+        if (!m) return;
+
+        const allEntries = await db.select().from(entries).where(eq(entries.metricId, m.id)).orderBy(desc(entries.timestamp));
+        if (allEntries.length === 0) { CLIView.showInfo("No history found for this metric."); return; }
+
+        CLIView.showHeader(`Full History: ${m.name}`, COLORS.cyan);
+        const rows = allEntries.map((e, idx) => {
+            let valStr = typeof e.data === 'object' ? JSON.stringify(e.data) : String(e.data);
+            // Prettify common types if possible
+            if (m.type === 'SetRep' && e.data) {
+                const d = e.data as any;
+                valStr = `${d.set} x ${d.rep}`;
+            } else if (m.type === 'Count' || m.type === 'Goal') {
+                valStr = String((e.data as any).value || 0);
+            }
+
+            return [
+                String(allEntries.length - idx),
+                new Date(e.timestamp).toLocaleString(),
+                valStr
+            ];
+        });
+
+        CLIView.formatTable(["#", "Date & Time", "Value"], rows.reverse());
+        console.log("\nPress any key to return...");
+        await CLIView.promptText("");
     }
 
     async showReport(boardId: number) {
@@ -267,14 +304,86 @@ export class CLIController {
             return;
         }
 
+        // Special handling for Checklist and Task types
+        if (m.type === 'Checklist' || m.type === 'Task') {
+            await this.manageChecklist(m, boardId);
+            return;
+        }
+
         const rawInput = await this.promptForValue(m.type, (m.schema as any)?.unit);
         if (rawInput === undefined) return;
 
         const payload = this.parseValuePayload(m.type, rawInput);
+        if (payload === null) return; // Parsing error handled inside parseValuePayload
+
         await db.insert(entries).values({ metricId: m.id, data: payload, timestamp: new Date() });
 
         CLIView.showSuccess("Value added successfully!");
         await this.printFreshInfo(boardId, m.id);
+    }
+
+    async manageChecklist(metric: any, boardId: number) {
+        let loop = true;
+        while (loop) {
+            const schema = metric.schema || {};
+            const items = Array.isArray(schema.items) ? schema.items : [];
+            const completedCount = items.filter((i: any) => i.completed).length;
+            const progress = items.length > 0 ? (completedCount / items.length * 100).toFixed(1) : "0.0";
+
+            CLIView.showHeader(`Manage Checklist: ${metric.name} (${progress}%)`, COLORS.cyan);
+
+            // Format existing items as choices
+            const choices = items.map((item: any) => ({
+                title: `[${item.completed ? 'X' : ' '}] ${item.text}`,
+                value: `toggle:${item.id}`
+            }));
+
+            const result = await CLIView.promptAction("Select item to toggle, or choose an action:", [
+                ...choices,
+                { title: "+ Add new task", value: "add" },
+                { title: "- Remove a task", value: "remove" },
+                { title: "Done", value: "done" }
+            ]);
+
+            if (!result || result === "done") {
+                loop = false;
+                break;
+            }
+
+            let newItems = [...items];
+            if (result === "add") {
+                const text = await CLIView.promptText("Enter task description:");
+                if (text) {
+                    newItems.push({ id: Date.now().toString(), text, completed: false });
+                }
+            } else if (result === "remove") {
+                if (items.length === 0) { CLIView.showInfo("No tasks to remove."); continue; }
+                const toRemoveIdx = await CLIView.promptAction("Select task to remove:", items.map((item: any, idx: number) => ({ title: item.text, value: idx.toString() })));
+                if (toRemoveIdx !== undefined) {
+                    newItems.splice(parseInt(toRemoveIdx), 1);
+                }
+            } else if (result.startsWith("toggle:")) {
+                const id = result.replace("toggle:", "");
+                newItems = newItems.map(i => i.id === id ? { ...i, completed: !i.completed } : i);
+            }
+
+            // Update schema and log progress
+            const newCompletedCount = newItems.filter((i: any) => i.completed).length;
+            const newPercentage = newItems.length > 0 ? (newCompletedCount / newItems.length * 100) : 0;
+            const newSchema = { ...schema, items: newItems };
+
+            await db.update(metricDefinitions).set({ schema: newSchema }).where(eq(metricDefinitions.id, metric.id));
+            await db.insert(entries).values({
+                metricId: metric.id,
+                data: { value: newPercentage },
+                timestamp: new Date()
+            });
+
+            // Update local object for loop
+            metric.schema = newSchema;
+            CLIView.showSuccess("Checklist updated.");
+        }
+        await this.printFreshInfo(boardId, metric.id);
     }
 
     private async promptForValue(metricType: string, unit: string = ""): Promise<any> {
