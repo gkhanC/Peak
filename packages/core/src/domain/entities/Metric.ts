@@ -1,4 +1,4 @@
-export type MetricType = 'SingleValue' | 'CompoundValue' | 'Checklist' | 'Count' | 'Goal' | 'CountTime' | 'MeasurementTime' | 'SetRep' | 'SetMeasurement' | 'SetRepTime' | 'SetMeasurementTime' | 'Measurement';
+export type MetricType = 'SingleValue' | 'CompoundValue' | 'Checklist' | 'Count' | 'Goal' | 'CountTime' | 'MeasurementTime' | 'SetRep' | 'SetMeasurement' | 'SetRepTime' | 'SetMeasurementTime' | 'Measurement' | 'SetRepMeasurement';
 export type ProgressDirection = 'Ascending' | 'Descending';
 
 export interface DayAggregate {

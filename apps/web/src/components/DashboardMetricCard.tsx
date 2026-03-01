@@ -19,6 +19,7 @@ import { SetRepPresenter } from "./presenters/SetRepPresenter";
 import { SetMeasurementPresenter } from "./presenters/SetMeasurementPresenter";
 import { SetRepTimePresenter } from "./presenters/SetRepTimePresenter";
 import { SetMeasurementTimePresenter } from "./presenters/SetMeasurementTimePresenter";
+import { SetRepMeasurementPresenter } from "./presenters/SetRepMeasurementPresenter";
 import { MetricChart } from "./presenters/MetricChart";
 import { AreaChart, Area, ResponsiveContainer } from "recharts";
 
@@ -123,6 +124,13 @@ export function DashboardMetricCard({ metric: initialMetric, boardName, onLog, b
                     const sm = s * m;
                     return { name: dateStr, value: t > 0 ? Number((sm / t).toFixed(2)) : sm, raw: agg.val };
                 }
+                if (metric.type === 'SetRepMeasurement') {
+                    const s = agg.val?.set || 0;
+                    const r = agg.val?.rep || 0;
+                    const m = agg.val?.measurement || 0;
+                    const srm = s * r * m;
+                    return { name: dateStr, value: srm, raw: agg.val };
+                }
 
                 return { name: dateStr, value: baseValue, raw: { value: baseValue } };
             });
@@ -158,6 +166,12 @@ export function DashboardMetricCard({ metric: initialMetric, boardName, onLog, b
                     const m = entry.data?.measurement || 0;
                     const t = entry.data?.time || 0;
                     valToMap = t > 0 ? Number(((s * m) / t).toFixed(2)) : (s * m);
+                }
+                if (metric.type === 'SetRepMeasurement') {
+                    const s = entry.data?.set || 0;
+                    const r = entry.data?.rep || 0;
+                    const m = entry.data?.measurement || 0;
+                    valToMap = s * r * m;
                 }
 
                 return { name: dateStr, value: valToMap, raw: entry.data };
@@ -217,6 +231,9 @@ export function DashboardMetricCard({ metric: initialMetric, boardName, onLog, b
     } else if (metric.type === 'SetMeasurementTime') {
         const unitLabel = metric.schema?.unit || 'UNIT';
         if (latestAgg && latestAgg.val) currentValueDisplay = `<span class="text-[10px] text-neutral-500 mr-1">SETS</span>${latestAgg.val.set || 0} <span class="text-[10px] text-neutral-500 mr-1 ml-2 uppercase">${unitLabel}</span>${latestAgg.val.measurement || 0} <span class="text-amber-500 ml-2"><span class="text-[10px] text-amber-900 mr-1">TIME</span>${latestAgg.val.time || 0}</span>`;
+    } else if (metric.type === 'SetRepMeasurement') {
+        const unitLabel = metric.schema?.unit || 'UNIT';
+        if (latestAgg && latestAgg.val) currentValueDisplay = `<span class="text-[10px] text-neutral-500 mr-1">SETS</span>${latestAgg.val.set || 0} <span class="text-[10px] text-neutral-500 mr-1 ml-2">REPS</span>${latestAgg.val.rep || 0} <span class="text-[10px] text-neutral-500 mr-1 ml-2 uppercase">${unitLabel}</span>${latestAgg.val.measurement || 0}`;
     }
 
     const targetDisplay = metric.target !== null ? metric.target : null;
@@ -292,7 +309,7 @@ export function DashboardMetricCard({ metric: initialMetric, boardName, onLog, b
                         {/* 3. Counter Value */}
                         <div className="flex flex-col items-end justify-center min-w-[70px] xl:w-[100px]">
                             <div className="flex items-baseline gap-1">
-                                {(metric.type as any) === 'CountTime' || (metric.type as any) === 'MeasurementTime' || metric.type === 'SetRep' || metric.type === 'SetMeasurement' || metric.type === 'SetRepTime' || metric.type === 'SetMeasurementTime' || metric.type === 'Measurement' ? (
+                                {(metric.type as any) === 'CountTime' || (metric.type as any) === 'MeasurementTime' || metric.type === 'SetRep' || metric.type === 'SetMeasurement' || metric.type === 'SetRepTime' || metric.type === 'SetMeasurementTime' || metric.type === 'SetRepMeasurement' || metric.type === 'Measurement' ? (
                                     <span className="text-xl font-black text-white tracking-tighter leading-none flex items-center" dangerouslySetInnerHTML={{ __html: currentValueDisplay as string }} />
                                 ) : metric.type === 'Checklist' ? (
                                     <span className="text-2xl font-black text-white tracking-tighter leading-none flex items-baseline">
@@ -573,6 +590,44 @@ export function DashboardMetricCard({ metric: initialMetric, boardName, onLog, b
                             </div>
                         )}
 
+                        {/* Inline Inputs for SetRepMeasurement */}
+                        {!isExpanded && (metric.type === 'SetRepMeasurement') && (
+                            <div className="xl:w-[220px] flex justify-end">
+                                <div className="flex items-center justify-center gap-1 bg-black/40 p-1 rounded-lg border border-white/5 shadow-inner">
+                                    <div className="relative">
+                                        <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[8px] font-black uppercase text-neutral-500">S</span>
+                                        <Input className="w-12 h-8 text-xs bg-transparent border-none text-white font-bold focus-visible:ring-1 focus-visible:ring-neutral-500 text-right pr-1.5 pl-4" placeholder="0" value={quickSet} onChange={(e) => setQuickSet(e.target.value)} type="number" step="any" />
+                                    </div>
+                                    <div className="w-[1px] h-3 bg-white/10 mx-0.5"></div>
+                                    <div className="relative">
+                                        <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[8px] font-black uppercase text-neutral-500">R</span>
+                                        <Input className="w-12 h-8 text-xs bg-transparent border-none text-white font-bold focus-visible:ring-1 focus-visible:ring-neutral-500 text-right pr-1.5 pl-4" placeholder="0" value={quickRep} onChange={(e) => setQuickRep(e.target.value)} type="number" step="any" />
+                                    </div>
+                                    <div className="w-[1px] h-3 bg-white/10 mx-0.5"></div>
+                                    <div className="relative">
+                                        <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[8px] font-black uppercase text-indigo-500/50">U</span>
+                                        <Input className="w-12 h-8 text-xs bg-transparent border-none text-white font-bold focus-visible:ring-1 focus-visible:ring-indigo-500 text-right pr-1.5 pl-4" placeholder="0" value={quickMeasurement} onChange={(e) => setQuickMeasurement(e.target.value)} type="number" step="any" />
+                                    </div>
+                                    <Button
+                                        size="icon"
+                                        className="h-8 w-8 shrink-0 rounded shadow-[0_0_10px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white transition-all transform hover:scale-105 ml-1"
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
+                                            if (quickSet === "" || quickRep === "" || quickMeasurement === "") return;
+                                            await logValue({ set: Number(quickSet), rep: Number(quickRep), measurement: Number(quickMeasurement) });
+                                            setQuickSet("");
+                                            setQuickRep("");
+                                            setQuickMeasurement("");
+                                            if (onLog) onLog();
+                                        }}
+                                        disabled={isLoading || quickSet === "" || quickRep === "" || quickMeasurement === ""}
+                                    >
+                                        {isLoading ? "..." : <Plus className="h-4 w-4 font-black drop-shadow-md" strokeWidth={3} />}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Inline Inputs for SingleValue, Measurement */}
                         {!isExpanded && (metric.type === 'SingleValue' || metric.type === 'Measurement') && (
                             <div className="xl:w-[220px] flex justify-end">
@@ -696,6 +751,8 @@ export function DashboardMetricCard({ metric: initialMetric, boardName, onLog, b
                                         <SetRepTimePresenter metric={metric} onLog={async (s, r, t) => { await logValue({ set: s, rep: r, time: t }); if (onLog) onLog(); }} isLoading={isLoading} />
                                     ) : metric.type === 'SetMeasurementTime' ? (
                                         <SetMeasurementTimePresenter metric={metric} onLog={async (s, m, t) => { await logValue({ set: s, measurement: m, time: t }); if (onLog) onLog(); }} isLoading={isLoading} />
+                                    ) : metric.type === 'SetRepMeasurement' ? (
+                                        <SetRepMeasurementPresenter metric={metric} onLog={async (s, r, m) => { await logValue({ set: s, rep: r, measurement: m }); if (onLog) onLog(); }} isLoading={isLoading} />
                                     ) : (
                                         <MeasurementPresenter metric={metric} onLog={async (v) => { await logValue({ value: v }); if (onLog) onLog(); }} isLoading={isLoading} />
                                     )}
@@ -713,8 +770,9 @@ export function DashboardMetricCard({ metric: initialMetric, boardName, onLog, b
                                                                     : metric.type === 'SetMeasurement' ? `${entry.data.set || 0}S × ${entry.data.measurement || 0}${metric.schema?.unit || 'U'}`
                                                                         : metric.type === 'SetRepTime' ? `${entry.data.set || 0}S × ${entry.data.rep || 0}R in ${entry.data.time || 0}T`
                                                                             : metric.type === 'SetMeasurementTime' ? `${entry.data.set || 0}S × ${entry.data.measurement || 0}${metric.schema?.unit || 'U'} in ${entry.data.time || 0}T`
-                                                                                : metric.type === 'CompoundValue' ? `${entry.data.set}s, ${entry.data.rep}r`
-                                                                                    : entry.data.value}
+                                                                                : metric.type === 'SetRepMeasurement' ? `${entry.data.set || 0}S × ${entry.data.rep || 0}R × ${entry.data.measurement || 0}${metric.schema?.unit || 'U'}`
+                                                                                    : metric.type === 'CompoundValue' ? `${entry.data.set}s, ${entry.data.rep}r`
+                                                                                        : entry.data.value}
                                                     </span>
                                                     <span className="text-[9px] text-neutral-500">
                                                         {new Date(entry.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}

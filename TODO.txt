@@ -1,6 +1,6 @@
-Bu listede ki taskleri sıra ile yap 
-Taskleri sıra ile yapacağız ama taskleri önce nasıl yapacağımızı Peak'ın kaynak kodunu inceleyerek planla, nasıl bu özellikleri sağlayacağımızı planlayarak, planı Peak'ın ana dizini içerisinde bir txt dosyasına yaz.
-Oluşturulan txt dosyasına uygun şekilde Peak kaynak kodunu geliştir. biten taskleri bu belgede [X] bitti olarak hazırla.
+Bu listede ki taskleri sırası ile yap.
+Öncelikle taskleri nasıl yapacağımızı, Peak'ın kaynak kodunu inceleyerek planla, sonra plana uygun şekilde taskleri tamamla. Planı Peak'ın ana dizini içerisinde bir txt dosyasına yaz.
+Oluşturulan txt dosyasına uygun şekilde Peak kaynak kodunu geliştir. Biten taskleri, bu belgede [X] bitti olarak işaretle.
 
 1. Analiz ve Stratejik Planlama
 [X] Peak kaynak kodunun detaylı analizini gerçekleştir.
@@ -55,6 +55,6 @@ Oluşturulan txt dosyasına uygun şekilde Peak kaynak kodunu geliştir. biten t
 
 [X] Linux, Windows ve macOS sistemler için kolay kurulum (deploy) yapılarını oluştur.
 
-[X] Tüm özellikleri ve CLI komutlarını örneklerle açıklayan kapsamlı bir README.md dosyası hazırla.
+[X] Tüm özellikleri Web ve CLI komutlarını örneklerle açıklayan kapsamlı bir README.md dosyası hazırla.
 
-[X] Kodları mantıksal gruplar halinde Git sistemine uygun şekilde commit'le ve GitHub için deploy sürecini tamamla.
+[X] Github için Vercel ile Peak'in bir canlı demosunu oluştur ve readme sayfasına demoyu ekle.

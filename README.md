@@ -69,6 +69,12 @@ Navigate your entire universe without touching the mouse:
   - Delete Metric
 - **Quick Switch**: Jump between different boards in milliseconds.
 
+**Creating a Board via Quick Menu:**
+![Create Board Demo](assets/demo_create_board.webp)
+
+**Navigating & Viewing Reports:**
+![Board Report Demo](assets/demo_board_report.webp)
+
 ### 📊 Visual Progress Report
 Every board features a comprehensive view of your growth:
 - **Daily Aggregations**: Visualize your consistency.
@@ -88,6 +94,11 @@ Peak is built on **SOLID** principles, ensuring it's easy to extend and maintain
 ---
 
 ## 🧪 Deployment & Development
+
+### 🚀 Deploy to Vercel
+Peak is ready to be deployed on Vercel with zero configuration. Click the button below to deploy your own instance:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FgkhanC%2FPeak&project-name=peak-dashboard&framework=nextjs)
 
 ### 🛠️ Manual Build
 If you wish to build the monorepo from scratch:

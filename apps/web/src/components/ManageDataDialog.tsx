@@ -55,8 +55,8 @@ export function ManageDataDialog({ metric, history, isOpen, onClose, onUpdate }:
             if (!newSet || !newMeasurement) return;
         } else if (metric.type === 'SetRepTime') {
             if (!newSet || !newRep || !newTime) return;
-        } else if (metric.type === 'SetMeasurementTime') {
-            if (!newSet || !newMeasurement || !newTime) return;
+        } else if (metric.type === 'SetRepMeasurement') {
+            if (!newSet || !newRep || !newMeasurement) return;
         } else {
             if (!newValue) return;
         }
@@ -76,8 +76,8 @@ export function ManageDataDialog({ metric, history, isOpen, onClose, onUpdate }:
                 dataPayload = { set: Number(newSet), measurement: Number(newMeasurement) };
             } else if (metric.type === 'SetRepTime') {
                 dataPayload = { set: Number(newSet), rep: Number(newRep), time: Number(newTime) };
-            } else if (metric.type === 'SetMeasurementTime') {
-                dataPayload = { set: Number(newSet), measurement: Number(newMeasurement), time: Number(newTime) };
+            } else if (metric.type === 'SetRepMeasurement') {
+                dataPayload = { set: Number(newSet), rep: Number(newRep), measurement: Number(newMeasurement) };
             } else {
                 dataPayload = { value: parseFloat(newValue) };
             }
@@ -124,7 +124,7 @@ export function ManageDataDialog({ metric, history, isOpen, onClose, onUpdate }:
                     {/* Add New Entry Form */}
                     <div className="bg-black/40 p-4 rounded-xl border border-white/5 space-y-4">
                         <div className="font-semibold text-sm">Add Past Entry</div>
-                        <div className={`grid ${(metric.type === 'SetRepTime' || metric.type === 'SetMeasurementTime') ? 'grid-cols-4' : (metric.type === 'CountTime' || metric.type === 'MeasurementTime' || metric.type === 'SetRep' || metric.type === 'SetMeasurement') ? 'grid-cols-3' : 'grid-cols-2'} gap-4`}>
+                        <div className={`grid ${(metric.type === 'SetRepTime' || metric.type === 'SetMeasurementTime' || metric.type === 'SetRepMeasurement') ? 'grid-cols-4' : (metric.type === 'CountTime' || metric.type === 'MeasurementTime' || metric.type === 'SetRep' || metric.type === 'SetMeasurement') ? 'grid-cols-3' : 'grid-cols-2'} gap-4`}>
                             <div className="space-y-2">
                                 <Label className="text-xs text-neutral-400">Date</Label>
                                 <Input type="date" value={newDate} onChange={(e) => setNewDate(e.target.value)} className="h-8 text-sm bg-black/50 border-neutral-800" />
@@ -141,11 +141,12 @@ export function ManageDataDialog({ metric, history, isOpen, onClose, onUpdate }:
                                         <Input type="number" step="any" value={newTime} onChange={(e) => setNewTime(e.target.value)} placeholder="0" className="h-8 text-sm bg-black/50 border-neutral-800" />
                                     </div>
                                 </>
-                            ) : metric.type === 'SetRep' || metric.type === 'SetRepTime' ? (
+                            ) : metric.type === 'SetRep' || metric.type === 'SetRepTime' || metric.type === 'SetRepMeasurement' ? (
                                 <>
                                     <div className="space-y-2"><Label className="text-xs text-neutral-400">Sets</Label><Input value={newSet} onChange={e => setNewSet(e.target.value)} type="number" step="any" className="h-8 text-sm bg-black/50 border-neutral-800" /></div>
                                     <div className="space-y-2"><Label className="text-xs text-neutral-400">Reps</Label><Input value={newRep} onChange={e => setNewRep(e.target.value)} type="number" step="any" className="h-8 text-sm bg-black/50 border-neutral-800" /></div>
                                     {metric.type === 'SetRepTime' && <div className="space-y-2"><Label className="text-xs text-neutral-400">Time</Label><Input value={newTime} onChange={e => setNewTime(e.target.value)} type="number" step="any" className="h-8 text-sm bg-black/50 border-neutral-800" /></div>}
+                                    {metric.type === 'SetRepMeasurement' && <div className="space-y-2"><Label className="text-xs text-neutral-400 uppercase">{metric.schema?.unit || 'Unit'}</Label><Input value={newMeasurement} onChange={e => setNewMeasurement(e.target.value)} type="number" step="any" className="h-8 text-sm bg-black/50 border-neutral-800" /></div>}
                                 </>
                             ) : metric.type === 'SetMeasurement' || metric.type === 'SetMeasurementTime' ? (
                                 <>
@@ -196,13 +197,15 @@ export function ManageDataDialog({ metric, history, isOpen, onClose, onUpdate }:
                                                         ? `${entry.data.set || 0} Sets × ${entry.data.rep || 0} Reps`
                                                         : metric.type === 'SetMeasurement'
                                                             ? `${entry.data.set || 0} Sets × ${entry.data.measurement || 0} ${metric.schema?.unit || 'Unit'}`
-                                                            : metric.type === 'SetRepTime'
-                                                                ? `${entry.data.set || 0}S × ${entry.data.rep || 0}R in ${entry.data.time || 0}T`
-                                                                : metric.type === 'SetMeasurementTime'
-                                                                    ? `${entry.data.set || 0}S × ${entry.data.measurement || 0}${metric.schema?.unit || 'U'} in ${entry.data.time || 0}T`
-                                                                    : metric.type === 'CompoundValue'
-                                                                        ? `${entry.data.set} sets, ${entry.data.rep} reps`
-                                                                        : `${entry.data.value} ${metric.schema?.unit || ''}`}
+                                                            : metric.type === 'SetRepMeasurement'
+                                                                ? `${entry.data.set || 0}S × ${entry.data.rep || 0}R × ${entry.data.measurement || 0} ${metric.schema?.unit || 'Unit'}`
+                                                                : metric.type === 'SetRepTime'
+                                                                    ? `${entry.data.set || 0}S × ${entry.data.rep || 0}R in ${entry.data.time || 0}T`
+                                                                    : metric.type === 'SetMeasurementTime'
+                                                                        ? `${entry.data.set || 0}S × ${entry.data.measurement || 0}${metric.schema?.unit || 'U'} in ${entry.data.time || 0}T`
+                                                                        : metric.type === 'CompoundValue'
+                                                                            ? `${entry.data.set} sets, ${entry.data.rep} reps`
+                                                                            : `${entry.data.value} ${metric.schema?.unit || ''}`}
                                         </span>
                                         <span className="text-xs text-neutral-500">
                                             {new Date(entry.timestamp).toLocaleString(undefined, {

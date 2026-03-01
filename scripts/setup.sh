@@ -2,6 +2,9 @@
 
 # Peak Setup Script for Linux/macOS
 
+# Ensure we are in the project root
+cd "$(dirname "$0")/.." || exit 1
+
 echo "🚀 Starting Peak Setup..."
 
 # Install root dependencies

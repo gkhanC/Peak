@@ -41,7 +41,7 @@ export function NewMetricDialog({ boardId, onCreated }: NewMetricDialogProps) {
         }
 
         setIsSaving(true);
-        const finalProgressDirection = (type === 'SetRep' || type === 'SetMeasurement') ? 'Ascending' : progressDirection;
+        const finalProgressDirection = (type === 'SetRep' || type === 'SetMeasurement' || type === 'SetRepMeasurement') ? 'Ascending' : progressDirection;
         let finalSchema: any = { value: "number", ...(isDescendingCounter ? { startingValue: Number(startingValue) } : {}) };
 
         if (type === 'Checklist') finalSchema = { items: [] };
@@ -49,6 +49,7 @@ export function NewMetricDialog({ boardId, onCreated }: NewMetricDialogProps) {
         else if (type === 'MeasurementTime') finalSchema = { measurementDirection, timeDirection, unit };
         else if (type === 'SetRepTime') finalSchema = { timeDirection };
         else if (type === 'SetMeasurementTime') finalSchema = { timeDirection, unit };
+        else if (type === 'SetRepMeasurement') finalSchema = { unit };
         else if (type === 'SetMeasurement') finalSchema = { unit };
         else if (type === 'Measurement') finalSchema = { unit, value: "number", ...(isDescendingCounter ? { startingValue: Number(startingValue) } : {}) };
 
@@ -119,6 +120,7 @@ export function NewMetricDialog({ boardId, onCreated }: NewMetricDialogProps) {
                             <option value="MeasurementTime">Measurement + Time Split</option>
                             <option value="SetRep">Set × Rep</option>
                             <option value="SetMeasurement">Set × Measurement</option>
+                            <option value="SetRepMeasurement">Set × Tekrar × Ölçü</option>
                             <option value="SetRepTime">Set × Rep × Time</option>
                             <option value="SetMeasurementTime">Set × Measurement × Time</option>
                         </select>
@@ -150,7 +152,7 @@ export function NewMetricDialog({ boardId, onCreated }: NewMetricDialogProps) {
                         </div>
                     )}
 
-                    {(type === 'Measurement' || type === 'SetMeasurement' || type === 'SetMeasurementTime' || type === 'MeasurementTime') && (
+                    {(type === 'Measurement' || type === 'SetMeasurement' || type === 'SetMeasurementTime' || type === 'MeasurementTime' || type === 'SetRepMeasurement') && (
                         <div className="grid gap-2">
                             <Label htmlFor="unit">Unit (Optional)</Label>
                             <Input
@@ -182,10 +184,10 @@ export function NewMetricDialog({ boardId, onCreated }: NewMetricDialogProps) {
                                     value={progressDirection}
                                     onChange={(e) => setProgressDirection(e.target.value)}
                                     className="flex h-10 w-full rounded-md border border-slate-800 bg-[#050505] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                    disabled={type === 'SetRep' || type === 'SetMeasurement'}
+                                    disabled={type === 'SetRep' || type === 'SetMeasurement' || type === 'SetRepMeasurement'}
                                 >
                                     <option value="Ascending">Ascending (+)</option>
-                                    {type !== 'SetRep' && type !== 'SetMeasurement' && <option value="Descending">Descending (-)</option>}
+                                    {type !== 'SetRep' && type !== 'SetMeasurement' && type !== 'SetRepMeasurement' && <option value="Descending">Descending (-)</option>}
                                 </select>
                             </div>
                         </div>

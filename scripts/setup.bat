@@ -1,4 +1,8 @@
 @echo off
+
+:: Ensure we are in the project root
+cd /d "%~dp0\.."
+
 echo 🚀 Starting Peak Setup...
 
 echo 📦 Installing internal dependencies...

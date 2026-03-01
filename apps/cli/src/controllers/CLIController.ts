@@ -164,9 +164,21 @@ export class CLIController {
         const rows = allEntries.map((e, idx) => {
             let valStr = typeof e.data === 'object' ? JSON.stringify(e.data) : String(e.data);
             // Prettify common types if possible
-            if (m.type === 'SetRep' && e.data) {
+            if ((m.type === 'SetRep' || m.type === 'CompoundValue') && e.data) {
                 const d = e.data as any;
-                valStr = `${d.set} x ${d.rep}`;
+                valStr = `${d.set}S x ${d.rep}R`;
+            } else if (m.type === 'SetMeasurement' && e.data) {
+                const d = e.data as any;
+                valStr = `${d.set}S x ${d.measurement}${m.schema?.unit || 'U'}`;
+            } else if (m.type === 'SetRepTime' && e.data) {
+                const d = e.data as any;
+                valStr = `${d.set}S x ${d.rep}R in ${d.time}T`;
+            } else if (m.type === 'SetMeasurementTime' && e.data) {
+                const d = e.data as any;
+                valStr = `${d.set}S x ${d.measurement}${m.schema?.unit || 'U'} in ${d.time}T`;
+            } else if (m.type === 'SetRepMeasurement' && e.data) {
+                const d = e.data as any;
+                valStr = `${d.set}S x ${d.rep}R x ${d.measurement}${m.schema?.unit || 'U'}`;
             } else if (m.type === 'Count' || m.type === 'Goal') {
                 valStr = String((e.data as any).value || 0);
             }
@@ -225,7 +237,7 @@ export class CLIController {
         const types = [
             'SingleValue', 'CompoundValue', 'Task', 'Count', 'Goal',
             'Measurement', 'SetRep', 'SetMeasurement', 'CountTime',
-            'MeasurementTime', 'SetRepTime', 'SetMeasurementTime'
+            'MeasurementTime', 'SetRepTime', 'SetMeasurementTime', 'SetRepMeasurement'
         ];
 
         const typeChoices = types.map(t => ({ title: CLIView.formatMetricType(t), value: t }));
@@ -394,6 +406,8 @@ export class CLIController {
                 return CLIView.promptText('Enter Set x Rep (e.g., 3x12):');
             case 'SetMeasurement':
                 return CLIView.promptText(`Enter Set x Measurement${unitHint} (e.g., 3x10):`);
+            case 'SetRepMeasurement':
+                return CLIView.promptText(`Enter Set x Rep x Measurement${unitHint} (e.g., 3x12x50):`);
             case 'SetRepTime':
                 return CLIView.promptText('Enter Set x Rep = Time (e.g., 3x10=60):');
             case 'SetMeasurementTime':
@@ -425,6 +439,11 @@ export class CLIController {
                 const parts = s.split('x');
                 if (parts.length < 2) throw new Error("Format: Set x Measurement");
                 return { set: Number(parts[0]), measurement: Number(parts[1].replace(/[^0-9.]/g, '')) };
+            }
+            if (metricType === 'SetRepMeasurement') {
+                const parts = s.split('x');
+                if (parts.length < 3) throw new Error("Format: Set x Rep x Measurement");
+                return { set: Number(parts[0]), rep: Number(parts[1]), measurement: Number(parts[2].replace(/[^0-9.]/g, '')) };
             }
             if (metricType === 'SetRepTime') {
                 const [main, time] = s.split('=');

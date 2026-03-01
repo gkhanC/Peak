@@ -72,7 +72,8 @@ export class MetricService {
                         metric.type === 'SetRep' ||
                         metric.type === 'SetMeasurement' ||
                         metric.type === 'SetRepTime' ||
-                        metric.type === 'SetMeasurementTime'
+                        metric.type === 'SetMeasurementTime' ||
+                        metric.type === 'SetRepMeasurement'
                     ) {
                         const latest = dayEntries[dayEntries.length - 1];
                         dayVal = latest.data;

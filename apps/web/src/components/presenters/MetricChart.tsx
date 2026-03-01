@@ -39,7 +39,16 @@ const CustomTooltip = ({ active, payload, label, metric }: any) => {
                                     <div className="flex justify-between text-xs font-bold text-cyan-400"><span className="mr-3">Rate</span> <span>{value}</span></div>
                                 </>
                             )}
-                            {raw.set !== undefined && raw.rep !== undefined && raw.time === undefined && (
+                            {raw.set !== undefined && raw.rep !== undefined && raw.measurement !== undefined && raw.time === undefined && (
+                                <>
+                                    <div className="flex justify-between text-xs font-medium"><span className="text-neutral-500 mr-3">Set</span> <span className="text-white">{raw.set}</span></div>
+                                    <div className="flex justify-between text-xs font-medium"><span className="text-neutral-500 mr-3">Rep</span> <span className="text-white">{raw.rep}</span></div>
+                                    <div className="flex justify-between text-xs font-medium"><span className="text-neutral-500 mr-3 uppercase">{metric.schema?.unit || 'Unit'}</span> <span className="text-white">{raw.measurement}</span></div>
+                                    <div className="h-[1px] bg-white/10 my-1 w-full" />
+                                    <div className="flex justify-between text-xs font-bold text-cyan-400"><span className="mr-3">Total</span> <span>{value}</span></div>
+                                </>
+                            )}
+                            {raw.set !== undefined && raw.rep !== undefined && raw.measurement === undefined && raw.time === undefined && (
                                 <>
                                     <div className="flex justify-between text-xs font-medium"><span className="text-neutral-500 mr-3">Set</span> <span className="text-white">{raw.set}</span></div>
                                     <div className="flex justify-between text-xs font-medium"><span className="text-neutral-500 mr-3">Rep</span> <span className="text-white">{raw.rep}</span></div>
@@ -47,7 +56,7 @@ const CustomTooltip = ({ active, payload, label, metric }: any) => {
                                     <div className="flex justify-between text-xs font-bold text-cyan-400"><span className="mr-3">Total</span> <span>{value}</span></div>
                                 </>
                             )}
-                            {raw.set !== undefined && raw.measurement !== undefined && raw.time === undefined && (
+                            {raw.set !== undefined && raw.measurement !== undefined && raw.rep === undefined && raw.time === undefined && (
                                 <>
                                     <div className="flex justify-between text-xs font-medium"><span className="text-neutral-500 mr-3">Set</span> <span className="text-white">{raw.set}</span></div>
                                     <div className="flex justify-between text-xs font-medium"><span className="text-neutral-500 mr-3 uppercase">{metric.schema?.unit || 'Unit'}</span> <span className="text-white">{raw.measurement}</span></div>

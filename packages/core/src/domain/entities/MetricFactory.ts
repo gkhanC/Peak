@@ -8,6 +8,7 @@ import { SetRepMetric } from "./SetRepMetric";
 import { SetMeasurementMetric } from "./SetMeasurementMetric";
 import { SetRepTimeMetric } from "./SetRepTimeMetric";
 import { SetMeasurementTimeMetric } from "./SetMeasurementTimeMetric";
+import { SetRepMeasurementMetric } from "./SetRepMeasurementMetric";
 export class MetricFactory {
     static create(data: any): BaseMetric {
         const { type } = data;
