@@ -2,6 +2,8 @@
 
 Peak is a unified, high-performance tracking system designed for individuals who value data-driven growth. It seamlessly bridges the gap between deep **CLI efficiency** and a stunning **Web Dashboard** experience.
 
+![Peak Appearance](assets/screenshot.png)
+
 ---
 
 ## 🚀 Installation & Setup
