@@ -98,7 +98,7 @@ Peak is built on **SOLID** principles, ensuring it's easy to extend and maintain
 ### 🚀 Deploy to Vercel
 Peak is ready to be deployed on Vercel with zero configuration. Click the button below to deploy your own instance:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FgkhanC%2FPeak&project-name=peak-dashboard&framework=nextjs)
+[![Deploy with Vercel](https://vercel.com/button)](https://peak-deploy.vercel.app)
 
 ### 🛠️ Manual Build
 If you wish to build the monorepo from scratch:
