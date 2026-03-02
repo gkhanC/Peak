@@ -143,6 +143,7 @@ export function GlobalCommandPalette() {
             if (t === 'Checklist' || t === 'Task') payload = { value: Number(val) };
             else if (t === 'SetRep' || t === 'CompoundValue') { const [s, r] = val.toLowerCase().split('x'); payload = { set: Number(s), rep: Number(r) } }
             else if (t === 'SetMeasurement') { const [s, m] = val.toLowerCase().split('x'); payload = { set: Number(s), measurement: Number(m.replace(/[^0-9.]/g, '')) } }
+            else if (t === 'SetRepMeasurement') { const [s, r, m] = val.toLowerCase().split('x'); payload = { set: Number(s), rep: Number(r), measurement: Number(m.replace(/[^0-9.]/g, '')) } }
             else if (t === 'SetRepTime') { const [main, time] = val.toLowerCase().split('='); const [s, r] = main.split('x'); payload = { set: Number(s), rep: Number(r), time: Number(time) } }
             else if (t === 'SetMeasurementTime') { const [main, time] = val.toLowerCase().split('='); const [s, m] = main.split('x'); payload = { set: Number(s), measurement: Number(m.replace(/[^0-9.]/g, '')), time: Number(time) } }
             else if (t === 'CountTime') { const [c, time] = val.toLowerCase().split('='); payload = { count: Number(c), time: Number(time) } }
@@ -257,7 +258,7 @@ export function GlobalCommandPalette() {
         }
         else if (view === 'add_metric') {
             if (metricDraft.name && !metricDraft.type) {
-                const types = ['SingleValue', 'CompoundValue', 'Task', 'Count', 'Goal', 'Measurement', 'SetRep', 'SetMeasurement', 'CountTime', 'MeasurementTime', 'SetRepTime', 'SetMeasurementTime'];
+                const types = ['SingleValue', 'CompoundValue', 'Task', 'Count', 'Goal', 'Measurement', 'SetRep', 'SetMeasurement', 'SetRepMeasurement', 'CountTime', 'MeasurementTime', 'SetRepTime', 'SetMeasurementTime'];
                 const index = k.match(/[a-z]/) ? LETTERS.indexOf(k) : (parseInt(k) - 1);
                 if (index >= 0 && index < types.length) {
                     setMetricDraft({ ...metricDraft, type: types[index] });
@@ -481,7 +482,7 @@ export function GlobalCommandPalette() {
                                     </div>
                                 ) : !metricDraft.type ? (
                                     <Command.Group heading="Select Metric Type">
-                                        {['SingleValue', 'CompoundValue', 'Task', 'Count', 'Goal', 'Measurement', 'SetRep', 'SetMeasurement', 'CountTime', 'MeasurementTime', 'SetRepTime', 'SetMeasurementTime'].map((t, i) => (
+                                        {['SingleValue', 'CompoundValue', 'Task', 'Count', 'Goal', 'Measurement', 'SetRep', 'SetMeasurement', 'SetRepMeasurement', 'CountTime', 'MeasurementTime', 'SetRepTime', 'SetMeasurementTime'].map((t, i) => (
                                             <Command.Item key={t} onSelect={() => executeMenuAction(getPrefix(i))} className="flex items-center gap-3 p-2 rounded cursor-pointer hover:bg-white/5 transition-all">
                                                 <span className="text-cyan-400 font-bold w-4">{getPrefix(i)}</span>
                                                 <span>{t.replace(/([A-Z])/g, ' $1').trim()}</span>

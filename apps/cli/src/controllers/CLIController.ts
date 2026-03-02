@@ -20,6 +20,7 @@ export class CLIController {
                 { title: "Delete Board", value: "2" },
                 { title: "Select Board", value: "3" },
                 { title: "Launch Dashboard", value: "d" },
+                { title: "Create Desktop Shortcut", value: "s" },
                 { title: "Exit", value: "0" }
             ]);
 
@@ -33,6 +34,7 @@ export class CLIController {
                 case "2": await this.deleteBoard(); break;
                 case "3": await this.selectBoard(); break;
                 case "d": await this.openDashboard(); break;
+                case "s": await this.createShortcut(); break;
             }
         }
         process.exit(0);
@@ -628,17 +630,64 @@ export class CLIController {
                 const startNow = await CLIView.promptConfirm("Would you like to start the server now in the background?");
 
                 if (startNow) {
-                    // Check if we are in the project root
-                    if (!existsSync(join(process.cwd(), "package.json"))) {
-                        CLIView.showError("Could not find package.json in current directory.");
-                        CLIView.showInfo("Please run 'peak' from the root of the Peak project.");
+                    const { parse } = await import("path");
+                    const os = await import("os");
+                    const fs = await import("fs");
+                    const path = await import("path");
+                    let projectRoot = "";
+
+                    // Attempt to read from config first
+                    const configPath = path.join(os.homedir(), ".peak-config.json");
+                    if (fs.existsSync(configPath)) {
+                        try {
+                            const configData = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+                            if (configData.projectRoot && fs.existsSync(path.join(configData.projectRoot, "apps", "web", "package.json"))) {
+                                projectRoot = configData.projectRoot;
+                            }
+                        } catch (e) {
+                            // Ignored
+                        }
+                    }
+
+                    // 1. Search upwards from resolved real path of __dirname (handles symlinks)
+                    if (!projectRoot) {
+                        let current = existsSync(__dirname) ? require("fs").realpathSync(__dirname) : __dirname;
+                        while (current !== parse(current).root) {
+                            if (existsSync(join(current, "apps", "web", "package.json"))) {
+                                projectRoot = current;
+                                break;
+                            }
+                            current = join(current, "..");
+                        }
+                    }
+
+
+                    // 2. Search upwards from process.cwd()
+                    if (!projectRoot) {
+                        let current = process.cwd();
+                        while (current !== parse(current).root) {
+                            if (existsSync(join(current, "apps", "web", "package.json"))) {
+                                projectRoot = current;
+                                break;
+                            }
+                            current = join(current, "..");
+                        }
+                    }
+
+                    if (!projectRoot) {
+                        CLIView.showError("Could not find the Peak project root containing 'apps/web'.");
+                        CLIView.showInfo("Please run 'peak' from somewhere inside the Peak project directory.");
                         return;
                     }
 
-                    CLIView.showInfo("🚀 Starting server (npm run dev)...");
+                    CLIView.showInfo(`🚀 Starting server in ${projectRoot} (npm run dev)...`);
+
+                    const isWin = process.platform === 'win32';
+                    const npmCmd = isWin ? 'npm.cmd' : 'npm';
 
                     // Detach the process so it keeps running
-                    const child = spawn("npm", ["run", "dev"], {
+                    const child = spawn(npmCmd, ["run", "dev"], {
+                        cwd: projectRoot,
                         detached: true,
                         stdio: 'ignore'
                     });
@@ -659,6 +708,70 @@ export class CLIController {
         } catch (error) {
             CLIView.showError("An unexpected error occurred while launching dashboard.");
             CLIView.showInfo(`Manual URL: ${url}`);
+        }
+    }
+
+    async createShortcut() {
+        const { platform } = process;
+        const os = await import('os');
+        const path = await import('path');
+        const fs = await import('fs');
+        const { execSync } = await import('child_process');
+
+        let desktopPath = path.join(os.homedir(), 'Desktop');
+
+        if (!fs.existsSync(desktopPath)) {
+            try {
+                if (platform === 'linux') {
+                    const xdgDesktop = execSync('xdg-user-dir DESKTOP').toString().trim();
+                    if (xdgDesktop && fs.existsSync(xdgDesktop)) {
+                        desktopPath = xdgDesktop;
+                    }
+                }
+            } catch (e) {
+                // Ignore
+            }
+        }
+
+        const nodeExePath = process.execPath;
+        let nodeCliPath = path.join(__dirname, "index.js");
+        if (fs.existsSync(nodeCliPath)) {
+            nodeCliPath = fs.realpathSync(nodeCliPath);
+        }
+
+        try {
+            if (platform === 'win32') {
+                if (!fs.existsSync(desktopPath)) fs.mkdirSync(desktopPath, { recursive: true });
+                const batPath = path.join(desktopPath, 'Peak Dashboard.bat');
+                fs.writeFileSync(batPath, `@echo off\n"${nodeExePath}" "${nodeCliPath}" dashboard\nexit`);
+                CLIView.showSuccess('Created "Peak Dashboard.bat" on Desktop.');
+            } else if (platform === 'darwin') {
+                if (!fs.existsSync(desktopPath)) fs.mkdirSync(desktopPath, { recursive: true });
+                const appPath = path.join(desktopPath, 'PeakDashboard.app');
+                const appleScriptCmd = `\\\"${nodeExePath}\\\" \\\"${nodeCliPath}\\\" dashboard`;
+                const script = `tell application "Terminal"\n do script "${appleScriptCmd}"\n activate\nend tell`;
+                execSync(`osacompile -e '${script}' -o "${appPath}"`);
+                CLIView.showSuccess('Created PeakDashboard.app on Desktop.');
+            } else {
+                const linuxCmd = `"${nodeExePath}" "${nodeCliPath}" dashboard`;
+                const content = `[Desktop Entry]\nName=Peak Dashboard\nComment=Open Peak Dashboard\nExec=bash -c '${linuxCmd}'\nIcon=utilities-terminal\nTerminal=true\nType=Application\nCategories=Utility;`;
+
+                if (fs.existsSync(desktopPath)) {
+                    const desktopFilePath = path.join(desktopPath, 'PeakDashboard.desktop');
+                    fs.writeFileSync(desktopFilePath, content);
+                    execSync(`chmod +x "${desktopFilePath}"`);
+                    CLIView.showSuccess(`Created PeakDashboard.desktop in ${desktopPath}`);
+                }
+
+                const appsPath = path.join(os.homedir(), '.local', 'share', 'applications');
+                if (!fs.existsSync(appsPath)) fs.mkdirSync(appsPath, { recursive: true });
+                const localDesktopFile = path.join(appsPath, 'PeakDashboard.desktop');
+                fs.writeFileSync(localDesktopFile, content);
+                execSync(`chmod +x "${localDesktopFile}"`);
+                CLIView.showSuccess('Added Peak Dashboard to Application Menu.');
+            }
+        } catch (e: any) {
+            CLIView.showError(`Failed to create shortcut: ${e.message}`);
         }
     }
 

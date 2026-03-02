@@ -68,7 +68,8 @@ export function DashboardMetricCard({ metric: initialMetric, boardName, onLog, b
         isLoading,
         isFlipped,
         setIsFlipped,
-        logValue
+        logValue,
+        refresh
     } = useMetricController(initialMetric);
 
     const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
@@ -809,7 +810,7 @@ export function DashboardMetricCard({ metric: initialMetric, boardName, onLog, b
                 isOpen={isSettingsOpen}
                 startInDeleteMode={isSettingsDeleteMode}
                 onClose={() => setIsSettingsOpen(false)}
-                onUpdate={() => { if (onLog) onLog(); }} // Re-use onLog to trigger board refresh for now
+                onUpdate={() => { refresh(); if (onLog) onLog(); }}
             />
 
             <ManageDataDialog

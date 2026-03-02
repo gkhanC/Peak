@@ -64,6 +64,12 @@ export class MetricFactory {
                     data.schema, data.target, data.progressDirection, data.progressionMethod
                 );
                 break;
+            case 'SetRepMeasurement':
+                metric = new SetRepMeasurementMetric(
+                    data.id, data.boardId, data.name, data.type,
+                    data.schema, data.target, data.progressDirection, data.progressionMethod
+                );
+                break;
             case 'Measurement':
             case 'SingleValue':
             case 'CompoundValue':

@@ -104,6 +104,14 @@ program
         process.exit(0);
     });
 
+program
+    .command("create-shortcut")
+    .description("Create a desktop shortcut to launch the Peak Dashboard")
+    .action(async () => {
+        await controller.createShortcut();
+        process.exit(0);
+    });
+
 program.action(async () => {
     // If no command, run interactive mode
     await controller.runMainMenu();

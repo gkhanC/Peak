@@ -120,7 +120,7 @@ export function NewMetricDialog({ boardId, onCreated }: NewMetricDialogProps) {
                             <option value="MeasurementTime">Measurement + Time Split</option>
                             <option value="SetRep">Set × Rep</option>
                             <option value="SetMeasurement">Set × Measurement</option>
-                            <option value="SetRepMeasurement">Set × Tekrar × Ölçü</option>
+                            <option value="SetRepMeasurement">Set × Rep × Measurement</option>
                             <option value="SetRepTime">Set × Rep × Time</option>
                             <option value="SetMeasurementTime">Set × Measurement × Time</option>
                         </select>

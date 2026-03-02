@@ -16,18 +16,26 @@ echo "🏗️ Building Peak Monorepo..."
 npm run build
 
 # Link CLI globally (optional, but recommended)
-echo "🔗 Installing Peak CLI globally..."
+echo "🔗 Linking Peak CLI globally..."
 
-# Get absolute path to the CLI directory
-CLI_DIR="$(pwd)/apps/cli"
+# Use 'npm install -g .' from within the cli directory to install it natively without workspace issues
+cd apps/cli || exit 1
 
-# Use 'npm install -g' with the direct path to avoid monorepo workspace issues
 if [ -w "$(npm config get prefix)/lib/node_modules" ] || [ -w "/usr/local/lib/node_modules" ]; then
-    npm install -g "$CLI_DIR"
+    npm install -g .
 else
-    echo "⚠️ Permission denied. Please enter your password to install 'peak' globally:"
-    sudo npm install -g "$CLI_DIR"
+    echo "⚠️ Permission denied. Please enter your password to link 'peak' globally:"
+    sudo npm install -g .
 fi
+
+cd ../.. || exit 1
+
+echo "⚙️  Saving Peak configuration..."
+PROJECT_ROOT=$(pwd)
+echo "{\"projectRoot\": \"$PROJECT_ROOT\"}" > "$HOME/.peak-config.json"
+
+echo "🖥️  Creating Desktop Shortcut..."
+node apps/cli/dist/index.js create-shortcut
 
 echo "✅ Setup complete!"
 echo "You can now use 'peak' command or run 'npm run dev' to start the web dashboard."
